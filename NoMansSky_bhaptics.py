@@ -18,7 +18,7 @@
 # [tool.pymhf.logging]
 # log_dir = "."
 # log_level = "info"
-# window_name_override = "No Man's Sky bhaptics mod"
+# window_name_override = "No Mans Sky bhaptics mod"
 # ///
 
 
@@ -27,7 +27,7 @@ import threading
 import ctypes
 from typing import Annotated, Optional
 import time
-from logging import getLogger
+import logging
 
 from pymhf import Mod, load_mod_file, FUNCDEF
 from pymhf.core.memutils import get_addressof
@@ -41,7 +41,8 @@ from pymhf.gui.decorators import gui_button
 from bhaptics_library import bhaptics_suit, TimerController
 
 
-logger = getLogger("No Man's Sky bhaptics")
+# logging.basicConfig(filename='myapp.log', level=logging.INFO)
+logger = logging.getLogger("NMS_bhaptics")
 
 class cTkVector4f(ctypes.Structure):
     _fields_ = [
@@ -151,6 +152,7 @@ class bHapticsMod(Mod):
         self.playerHand = 0
         self.timerController = TimerController(self)
         time.sleep(5)
+        logger.info("Initializing suit...")
         self.myTactsuit = bhaptics_suit(app_id="693ac4ffa277918a719a1bd8", api_key="uSEDPxsVOpRefEGM7FAc", app_name="No Man's Sky")
 
 

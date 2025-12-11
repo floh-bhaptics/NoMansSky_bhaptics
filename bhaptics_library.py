@@ -3,7 +3,7 @@ import asyncio
 import time
 import threading
 from logging import getLogger
-logger = getLogger("bHaptics SDK wrapper")
+# logger = getLogger("NMS_bhaptics.bhaptics_library")
 
 
 class bhaptics_suit:
@@ -19,16 +19,18 @@ class bhaptics_suit:
         try:
             result = await bhaptics_python.registry_and_initialize(app_id, api_key, app_name)
             if not result:
-                logger.error("Failed to initialize bHaptics SDK")
+                # logger.error("Failed to initialize bHaptics SDK")
+                print("Failed")
             else:
-                logger.info("bHaptics SDK initialized")
+                # logger.info("bHaptics SDK initialized")
                 self.play_pattern("heartbeat")
         except Exception as e:
-            logger.error(f"Error initializing SDK: {e}")
+            print("Failed.")
+            # logger.error(f"Error initializing SDK: {e}")
 
     async def play_pattern(self, pattern_name: str, intensity: int = 100):
         if not self.connected:
-            logger.warn("Cannot send haptic signal: Suit not connected.")
+            # logger.warn("Cannot send haptic signal: Suit not connected.")
             return
 
         try:
@@ -39,7 +41,8 @@ class bhaptics_suit:
 
             request_id = await bhaptics_python.play_event(pattern_name)
         except Exception as e:
-            logger.warn(f"Failed to send haptic signal: {e}")
+            print("Failed")
+            # logger.warn(f"Failed to send haptic signal: {e}")
 
 class TimerController:
     def __init__(self,bhaptics_mod_instance):
