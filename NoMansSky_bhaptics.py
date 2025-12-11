@@ -17,7 +17,7 @@
 # 
 # [tool.pymhf.logging]
 # log_dir = "."
-# log_level = "info"
+# log_level = "debug"
 # window_name_override = "No Mans Sky bhaptics mod"
 # ///
 
@@ -28,6 +28,7 @@ import ctypes
 from typing import Annotated, Optional
 import time
 import logging
+import asyncio
 
 from pymhf import Mod, load_mod_file, FUNCDEF
 from pymhf.core.memutils import get_addressof
@@ -41,7 +42,6 @@ from pymhf.gui.decorators import gui_button
 from bhaptics_library import bhaptics_suit, TimerController
 
 
-# logging.basicConfig(filename='myapp.log', level=logging.INFO)
 logger = logging.getLogger("NMS_bhaptics")
 
 class cTkVector4f(ctypes.Structure):
@@ -150,10 +150,11 @@ class bHapticsMod(Mod):
         self.lastJetpackTime = 0
         self.lastLaserTime = 0
         self.playerHand = 0
-        self.timerController = TimerController(self)
         time.sleep(5)
-        logger.info("Initializing suit...")
-        self.myTactsuit = bhaptics_suit(app_id="693ac4ffa277918a719a1bd8", api_key="uSEDPxsVOpRefEGM7FAc", app_name="No Man's Sky")
+        logger.debug("Initializing suit...")
+        self.myTactsuit = bhaptics_suit(app_id="693ac4ffa277918a719a1bd8", api_key="uSEDPxsVOpRefEGM7FAc", app_name="No Mans Sky")
+        asyncio.run(self.myTactsuit.connect())
+        self.timerController = TimerController(self)
 
 
     def get_player_hand(self):
@@ -161,79 +162,79 @@ class bHapticsMod(Mod):
 
     @cGcPlayerCharacterComponent.SetDeathState.after
     def SetDeathState(self, *args):
-        # logger.info("PlayerDeath")
+        logger.debug("PlayerDeath")
         self.myTactsuit.play_pattern("PlayerDeath")
-        # logger.info(args)
+        # logger.debug(args)
 
     @cGcPlayer.TakeDamage.after
     def TakeDamage(self, this, damageAmount, damageType, damageId, dir_, owner, effectsDamageMultipliers):
         direction = dir_.contents
         if damageId == "LANDING":
-            # logger.info("FallDamage")
+            logger.debug("FallDamage")
             self.myTactsuit.play_pattern("FallDamage")
         else:
-            # logger.info("DefaultDamage")
+            logger.debug("DefaultDamage")
             self.myTactsuit.play_pattern("DefaultDamage")
-        # logger.info(f"damageAmount: {damageAmount},damageType :{damageType}, damageId: {damageId} , direction ({direction.x}, {direction.y}, {direction.z})")
+        logger.debug(f"damageAmount: {damageAmount},damageType :{damageType}, damageId: {damageId} , direction ({direction.x}, {direction.y}, {direction.z})")
 
     @cGcPlayer.OnEnteredCockpit.after
     def OnEnteredCockpit(self, *args):
-        # logger.info(f"GetOnSpaceship")        
+        logger.debug(f"GetOnSpaceship")        
         self.isInSpaceship = True
         if not self.isInSpaceJump:
             self.myTactsuit.play_pattern("GetOnSpaceship")
-        # logger.info(args)
+        # logger.debug(args)
 
     @cGcPlayer.GetDominantHand.after
     def GetDominantHand(self, *args,_result_):
         self.playerHand = _result_
-        # logger.info(f"GetDominantHand")
-        # logger.info(f"Result:{_result_}")
-        # logger.info(args)
+        logger.debug(f"GetDominantHand")
+        logger.debug(f"Result:{_result_}")
+        # logger.debug(args)
 
     @cTkAudioManager.Play.after
     def after_play(self, this, event, object_):
         audioID = map_struct(event, TkAudioID)
         if audioID.muID == 2149772978:
-            # logger.info(f"ScanWave")
+            logger.debug(f"ScanWave")
             self.myTactsuit.play_pattern("ScanWave")
         elif audioID.muID == 2815161641:
-            # logger.info(f"CollectItem")
+            logger.debug(f"CollectItem")
             self.myTactsuit.play_pattern("CollectItem")
         elif audioID.muID == 3451007219:
             if not self.isInSpaceJump:
-                # logger.info(f"SpaceshipSpeedUp")
+                logger.debug(f"SpaceshipSpeedUp")
                 self.myTactsuit.play_pattern("SpaceshipSpeedUp")
         elif audioID.muID == 3903008093:
-            # logger.info(f"SpaceshipOnGround")
+            logger.debug(f"SpaceshipOnGround")
             self.myTactsuit.play_pattern("SpaceshipOnGround")
         elif audioID.muID == 514090887:
-            # logger.info(f"SpaceshipTakeOff")
+            logger.debug(f"SpaceshipTakeOff")
             self.myTactsuit.play_pattern("SpaceshipTakeOff")
         elif audioID.muID == 1335995103:
-            # logger.info(f"SpaceshipEnterGalaxyMap")
+            logger.debug(f"SpaceshipEnterGalaxyMap")
             self.myTactsuit.play_pattern("SpaceshipSpeedUp")
         elif audioID.muID == 1261594536:
-            # logger.info(f"StartSpaceJump")
+            logger.debug(f"StartSpaceJump")
             self.isInSpaceJump = True
             self.timerController.start_spacejump()
         elif audioID.muID == 1511168854 or audioID.muID == 2852869421:
-            # logger.info(f"StopSpaceJump")
+            logger.debug(f"StopSpaceJump")
             self.isInSpaceJump = False
             self.timerController.stop_spacejump()
         elif audioID.muID == 2223503391 or audioID.muID == 3201991932 or audioID.muID == 3141878185:
-            # logger.info(f"StartPistolLaser")
+            logger.debug(f"StartPistolLaser")
             self.isPistolLaserFire = True
             self.timerController.start_pistol_laser()
         elif audioID.muID == 2191565963 or audioID.muID == 867290390 or audioID.muID == 2852869421:
-            # logger.info(f"StopPistolLaser")
+            logger.debug(f"StopPistolLaser")
             self.isPistolLaserFire = False
             self.timerController.stop_pistol_laser()
         elif audioID.muID == 3315033225:
-            # logger.info(f"StartScan")
+            logger.debug(f"StartScan")
             self.timerController.start_scan()
         elif audioID.muID == 290149060 or audioID.muID == 2852869421:
-            # logger.info(f"StopScan")
+            logger.debug(f"StopScan")
             self.timerController.stop_scan()
 
     @cGcNetworkWeapon.FireRemote.after
@@ -241,14 +242,14 @@ class bHapticsMod(Mod):
         if self.isPistolLaserFire:
             return
         if self.isInSpaceship:
-            # logger.info("SpaceshipWeaponShoot")
+            logger.debug("SpaceshipWeaponShoot")
             self.myTactsuit.play_pattern("SpaceshipWeaponShoot")
         else:
             if self.playerHand == 0:
-                # logger.info("RightHandPistolShoot")
+                logger.debug("RightHandPistolShoot")
                 self.myTactsuit.play_pattern("RightHandPistolShoot")
             else:
-                # logger.info("LeftHandPistolShoot")
+                logger.debug("LeftHandPistolShoot")
                 self.myTactsuit.play_pattern("LeftHandPistolShoot")
 
     @cGcLocalPlayerCharacterInterface.IsJetpacking.after
@@ -256,25 +257,20 @@ class bHapticsMod(Mod):
         if _result_ == 1:
             if time.perf_counter() - self.lastJetpackTime > 0.1:
                 self.lastJetpackTime = time.perf_counter()
-                # logger.info("PlayerUsingJetpack")
+                logger.debug("PlayerUsingJetpack")
                 self.myTactsuit.play_pattern("PlayerUsingJetpack")
-        # logger.info(f"-----------------------------------------------")
-        # logger.info(f"cGcLocalPlayerCharacterInterface::IsJetpacking")
-        # logger.info(f"Result:{_result_}")
-        # logger.info(f"cGcLocalPlayerCharacterInterface::IsJetpacking")
-        # logger.info(args)
         
     @cGcSpaceshipComponent.Eject.after
     def Eject(self, *args):
-        # logger.info(f"GetOffSpaceship")
+        logger.debug(f"GetOffSpaceship")
         self.isInSpaceship = False
         self.myTactsuit.play_pattern("GetOffSpaceship")
-        # logger.info(args)
+        # logger.debug(args)
     
     @cGcSpaceshipWarp.GetPulseDriveFuelFactor.after
     def GetPulseDriveFuelFactor(self,this, *args,_result_):
         if _result_ > self.lastFuelFactor:
-            # logger.info(f"PulseEngineHealing")
+            # logger.debug(f"PulseEngineHealing")
             # self.myTactsuit.play_pattern("PulseEngineHealing")
             self.lastFuelFactor = _result_
             return
@@ -283,10 +279,10 @@ class bHapticsMod(Mod):
                 self.lastFuelFactor = _result_
                 return
             self.lastFuelFactor = _result_
-            # logger.info(f"SpaceshipPulse")
+            logger.debug(f"SpaceshipPulse")
             self.myTactsuit.play_pattern("SpaceshipPulse")
-            # logger.info(f"Result:{_result_}")
-            # logger.info(args)
+            # logger.debug(f"Result:{_result_}")
+            # logger.debug(args)
 
 
 if __name__ == "__main__":
