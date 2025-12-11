@@ -28,7 +28,7 @@ class bhaptics_suit:
         except Exception as e:
             logger.error(f"Error initializing SDK: {e}")
 
-    def play_pattern(self, pattern_name: str, intensity: int = 100):
+    async def play_pattern(self, pattern_name: str, intensity: int = 100):
         if not self.connected:
             logger.warn("Cannot send haptic signal: Suit not connected.")
             return
@@ -39,7 +39,7 @@ class bhaptics_suit:
             if not (0 <= intensity <= 100):
                 raise ValueError("Intensity must be between 0 and 100.")
 
-            request_id = bhaptics_python.play_event(pattern_name)
+            request_id = await bhaptics_python.play_event(pattern_name)
         except Exception as e:
             logger.warn(f"Failed to send haptic signal: {e}")
 
@@ -72,7 +72,7 @@ class TimerController:
                     break
             if self.bhaptics_mod.get_player_hand() == 0:
                 # logger.info("RightHandPistolLaserShoot")
-                self.myTactsuit.play_pattern("heartbeat")
+                self.myTactsuit.play_pattern("RightHandPistolLaserShoot")
             else:
                 # logger.info("LeftHandPistolLaserShoot")
                 self.myTactsuit.play_pattern("LeftHandPistolLaserShoot")
