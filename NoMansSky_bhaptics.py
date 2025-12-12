@@ -14,8 +14,11 @@
 # exe = "NMS.exe"
 # steam_gameid = 275850
 # start_paused = false
+# default_mod_save_dir = "."
+# internal_mod_dir = "."
 # 
 # [tool.pymhf.logging]
+# shown = false
 # log_dir = "."
 # log_level = "debug"
 # window_name_override = "No Mans Sky bhaptics mod"
@@ -151,7 +154,7 @@ class bHapticsMod(Mod):
         self.lastLaserTime = 0
         self.playerHand = 0
         time.sleep(5)
-        logger.debug("Initializing suit...")
+        logger.info("Initializing suit...")
         self.myTactsuit = bhaptics_suit(app_id="693ac4ffa277918a719a1bd8", api_key="uSEDPxsVOpRefEGM7FAc", app_name="No Mans Sky")
         asyncio.run(self.myTactsuit.connect())
         self.timerController = TimerController(self)

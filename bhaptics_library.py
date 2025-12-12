@@ -4,7 +4,7 @@ import time
 import threading
 import logging
 
-logging.basicConfig(filename='myapp.log', level=logging.INFO)
+# logging.basicConfig(filename='myapp.log', level=logging.INFO)
 logger = logging.getLogger("NMS_bhaptics.bhaptics_library")
 
 
@@ -23,12 +23,12 @@ class bhaptics_suit:
                 logger.error("Failed to initialize bHaptics SDK")
             else:
                 logger.info("bHaptics SDK initialized")
-                self.play_pattern("heartbeat")
                 self.connected = True
+                self.play_pattern("heartbeat")
         except Exception as e:
             logger.error(f"Error initializing SDK: {e}")
 
-    async def play_pattern(self, pattern_name: str, intensity: int = 100):
+    def play_pattern(self, pattern_name: str, intensity: int = 100):
         if not self.connected:
             logger.warn("Cannot send haptic signal: Suit not connected.")
             return
@@ -39,7 +39,7 @@ class bhaptics_suit:
             if not (0 <= intensity <= 100):
                 raise ValueError("Intensity must be between 0 and 100.")
 
-            request_id = await bhaptics_python.play_event(pattern_name)
+            request_id = bhaptics_python.play_event(pattern_name)
         except Exception as e:
             logger.warn(f"Failed to send haptic signal: {e}")
 
