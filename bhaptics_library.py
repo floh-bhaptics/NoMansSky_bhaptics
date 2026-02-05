@@ -38,8 +38,8 @@ class bhaptics_suit:
                 raise TypeError("Pattern name must be a string.")
             if not (0 <= intensity <= 100):
                 raise ValueError("Intensity must be between 0 and 100.")
-
-            request_id = bhaptics_python.play_event(pattern_name)
+            lower_pattern = pattern_name.lower()
+            request_id = bhaptics_python.play_event(lower_pattern)
         except Exception as e:
             logger.warn(f"Failed to send haptic signal: {e}")
 
@@ -47,17 +47,17 @@ class bhaptics_suit:
 
 class TimerController:
     def __init__(self,bhaptics_mod_instance):
-        self.pistol_laser_interval = 0.07
+        self.pistol_laser_interval = 0.1
         self.pistol_laser_running = False
         self.pistol_laser_thread = None
         self.pistol_laser_lock = threading.Lock()
 
-        self.scan_interval = 0.1  # 100ms
+        self.scan_interval = 0.5
         self.scan_running = False
         self.scan_thread = None
         self.scan_lock = threading.Lock()
 
-        self.spacejump_interval = 1  # 100ms
+        self.spacejump_interval = 0.5
         self.spacejump_running = False
         self.spacejump_thread = None
         self.spacejump_lock = threading.Lock()
@@ -72,10 +72,10 @@ class TimerController:
                     break
             if self.bhaptics_mod.get_player_hand() == 0:
                 # logger.info("RightHandPistolLaserShoot")
-                self.myTactsuit.play_pattern("RightHandPistolLaserShoot")
+                self.myTactsuit.play_pattern("righthandpistollasershoot")
             else:
                 # logger.info("LeftHandPistolLaserShoot")
-                self.myTactsuit.play_pattern("LeftHandPistolLaserShoot")
+                self.myTactsuit.play_pattern("lefthandpistollasershoot")
             time.sleep(self.pistol_laser_interval)
     
     def start_pistol_laser(self):
@@ -102,7 +102,7 @@ class TimerController:
                 if not self.scan_running:
                     break
             # logger.info("Scanning")
-            self.myTactsuit.play_pattern("Scanning")
+            self.myTactsuit.play_pattern("scanning")
             time.sleep(self.scan_interval)
     
     def start_scan(self):
@@ -129,7 +129,7 @@ class TimerController:
                 if not self.spacejump_running:
                     break
             # logger.info("SpaceJump")
-            self.myTactsuit.play_pattern("SpaceshipPulse")
+            self.myTactsuit.play_pattern("spaceshippulse")
             time.sleep(self.spacejump_interval)
     
     def start_spacejump(self):

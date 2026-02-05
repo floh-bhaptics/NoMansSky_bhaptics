@@ -1,6 +1,6 @@
 
 # /// script
-# dependencies = ["pymhf","nmspy"]
+# dependencies = ["pymhf==0.1.12","nmspy"]
 #
 # [tool.uv.sources]
 # pymhf = { index = "pypi_test" }
@@ -18,7 +18,7 @@
 # internal_mod_dir = "."
 # 
 # [tool.pymhf.logging]
-# shown = false
+# shown = true
 # log_dir = "."
 # log_level = "debug"
 # window_name_override = "No Mans Sky bhaptics mod"
