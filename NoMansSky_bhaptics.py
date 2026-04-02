@@ -1,6 +1,6 @@
 
 # /// script
-# dependencies = ["pymhf==0.1.12","nmspy"]
+# dependencies = ["pymhf==0.2.2"]
 #
 # [tool.uv.sources]
 # pymhf = { index = "pypi_test" }
